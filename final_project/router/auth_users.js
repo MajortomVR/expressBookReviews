@@ -6,23 +6,50 @@ const regd_users = express.Router();
 let users = [];
 
 const isValid = (username)=>{ //returns boolean
-//write code to check is the username is valid
+    return users.filter((user) => user.username === username).length === 0;
 }
 
 const authenticatedUser = (username,password)=>{ //returns boolean
-//write code to check if username and password match the one we have in records.
+    //write code to check if username and password match the one we have in records.
+    for (const user of users) {
+        if (username === user.username && password === user.password) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const {username, password} = req.body;
+
+    // Check if username and password matches
+    if (authenticatedUser(username, password)) {
+        let accessToken = jwt.sign({ username: username }, "customer", { expiresIn: 60 * 60 });
+
+        req.session.authorization = {
+            accessToken, username
+        }
+
+        return res.send("Customer successfully logged in.");
+    } else {
+        return res.status(401).send("Invalid username and/or password.");
+    }
 });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const isbn = req.params.isbn;
+    const review = req.query.review;
+    const username = req.session.authorization.username;
+
+    if (isbn in books) {
+        books[isbn].reviews[username] = review;
+        return res.send(`Review for the book with ISBN ${isbn} has been added/updated.`);
+    } else {
+        return res.status(404).send(`There is no book with the given ISBN ${isbn}.`);
+    }    
 });
 
 module.exports.authenticated = regd_users;
