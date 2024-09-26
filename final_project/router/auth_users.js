@@ -34,6 +34,7 @@ regd_users.post("/login", (req,res) => {
 
         return res.send("Customer successfully logged in.");
     } else {
+        // TODO: ERROR Username or password wrong
         return res.status(401).send("Invalid username and/or password.");
     }
 });
@@ -50,6 +51,19 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     } else {
         return res.status(404).send(`There is no book with the given ISBN ${isbn}.`);
     }    
+});
+
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    const username = req.session.authorization.username;
+
+    if (isbn in books) {
+        delete books[isbn].reviews[username];
+        return res.send(`Review for the ISBN ${isbn} posted by the user ${username} deleted.`);
+    }
+
+    return res.status(404).send(`There is no book with the given ISBN ${isbn}.`);
 });
 
 module.exports.authenticated = regd_users;
