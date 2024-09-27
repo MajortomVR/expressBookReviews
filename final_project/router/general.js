@@ -89,24 +89,34 @@ public_users.get('/author/:author',function (req, res) {
 public_users.get('/title/:title',function (req, res) {
     const title = req.params.title.toLowerCase();
     
-    let bookList = {
-        booksbytitle: []
-    };
-
-    for (let isbn in books) {
-        const book = books[isbn];
-
-        if (title === book.title.toLowerCase()) {
-            bookList.booksbytitle.push({
-                isbn: isbn,
-                author: book.author,
-                review: book.reviews
-            });
+    const getBooks = new Promise((resolve, reject) => {
+        let bookList = {
+            booksbytitle: []
+        };
+    
+        for (let isbn in books) {
+            const book = books[isbn];
+    
+            if (title === book.title.toLowerCase()) {
+                bookList.booksbytitle.push({
+                    isbn: isbn,
+                    author: book.author,
+                    review: book.reviews
+                });
+            }
         }
-    }
 
-    return res.json(bookList);
+        resolve(bookList);
+    });
+    
+    getBooks.then((bookList) => {
+        res.json(bookList);
+    }).catch(error => {
+        console.log(error);
+        res.status(500).send('Internal Server Error.');
+    });    
 });
+
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
