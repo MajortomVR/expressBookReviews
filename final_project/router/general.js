@@ -27,7 +27,16 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-    return res.send(JSON.stringify(books, null, 4));
+    const getBooks = new Promise((resolve, reject) => {
+        resolve(JSON.stringify(books, null, 4));
+    });
+    
+    getBooks.then((bookList) => {
+        res.send(bookList);
+    }).catch(error => {
+        console.log(error);
+        res.status(500).send('Internal Server Error.');
+    });
 });
 
 // Get book details based on ISBN
