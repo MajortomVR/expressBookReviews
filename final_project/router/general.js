@@ -57,23 +57,32 @@ public_users.get('/isbn/:isbn',function (req, res) {
 public_users.get('/author/:author',function (req, res) {
     const author = req.params.author.toLowerCase();
 
-    let bookList = {        
-        booksbyauthor: []
-    };
-
-    for (let isbn in books) {        
-        const book = books[isbn];
-                
-        if (author === book.author.toLowerCase()) {
-            bookList.booksbyauthor.push({
-                isbn: isbn,
-                title: book.title,
-                review: book.reviews
-            });
+    const getBooks = new Promise((resolve, reject) => {
+        let bookList = {        
+            booksbyauthor: []
+        };
+    
+        for (let isbn in books) {        
+            const book = books[isbn];
+                    
+            if (author === book.author.toLowerCase()) {
+                bookList.booksbyauthor.push({
+                    isbn: isbn,
+                    title: book.title,
+                    review: book.reviews
+                });
+            }
         }
-    }
 
-    return res.json(bookList);
+        resolve(bookList);
+    });
+    
+    getBooks.then((bookList) => {
+        res.json(bookList);
+    }).catch(error => {
+        console.log(error);
+        res.status(500).send('Internal Server Error.');
+    });    
 });
 
 // Get all books based on title
