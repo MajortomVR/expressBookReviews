@@ -32,7 +32,7 @@ public_users.get('/',function (req, res) {
     });
     
     getBooks.then((bookList) => {
-        res.send(bookList);
+        res.json(bookList);
     }).catch(error => {
         console.log(error);
         res.status(500).send('Internal Server Error.');
@@ -46,7 +46,7 @@ public_users.get('/isbn/:isbn',function (req, res) {
     });
 
     getBooks.then((book) => {
-        res.send(book);
+        res.json(book);
     }).catch(error => {
         console.log(error);
         res.status(500).send('Internal Server Error.');
