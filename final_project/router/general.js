@@ -41,7 +41,16 @@ public_users.get('/',function (req, res) {
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-    return res.json(books[req.params.isbn]);
+    const getBooks = new Promise((resolve, reject) => {
+        resolve(books[req.params.isbn]);
+    });
+
+    getBooks.then((book) => {
+        res.send(book);
+    }).catch(error => {
+        console.log(error);
+        res.status(500).send('Internal Server Error.');
+    });  
  });
   
 // Get book details based on author
